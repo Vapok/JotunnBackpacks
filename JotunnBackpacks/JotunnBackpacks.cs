@@ -290,19 +290,23 @@ namespace JotunnBackpacks
             Log.LogMessage("Quickdropping backpack.");
 
             var player = Player.m_localPlayer;
-            var backpack = GetEquippedBackpack();
+            var backpack = GetEquippedBackpack().Data().Get<BackpackComponent>();
+
+            backpack.Save();
+
+            var backpackItem = backpack.Item;
 
             // Unequip and remove backpack from player's back
             // We need to unequip the item BEFORE we drop it, otherwise when we pick it up again the game thinks
             // we had it equipped all along and fails to update player model, resulting in invisible backpack.
-            player.RemoveEquipAction(backpack);
-            player.UnequipItem(backpack, true);
-            player.m_inventory.RemoveItem(backpack);
+            player.RemoveEquipAction(backpack.Item);
+            player.UnequipItem(backpack.Item, true);
+            player.m_inventory.RemoveItem(backpack.Item);
 
             // This drops a copy of the backpack itemDrop.itemData
-            var itemDrop = ItemDrop.DropItem(backpack, 1, player.transform.position + player.transform.forward + player.transform.up, player.transform.rotation);
-
-
+            var itemDrop = ItemDrop.DropItem(backpack.Item, 1, player.transform.position + player.transform.forward + player.transform.up, player.transform.rotation);
+            itemDrop.Save();
+            
             // The following is just notes on various potential ways of making the backpack non-despawnable after quickdropping it
             //var component = itemDrop.gameObject.AddComponent<EffectArea>();
             //component.m_type = EffectArea.Type.PlayerBase;
